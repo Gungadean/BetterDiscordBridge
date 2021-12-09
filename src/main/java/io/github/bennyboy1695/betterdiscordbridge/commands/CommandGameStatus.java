@@ -1,16 +1,13 @@
 package io.github.bennyboy1695.betterdiscordbridge.commands;
 
-import com.velocitypowered.api.command.Command;
 import com.velocitypowered.api.command.CommandSource;
+import com.velocitypowered.api.command.SimpleCommand;
 import io.github.bennyboy1695.betterdiscordbridge.BetterDiscordBridge;
 import net.dv8tion.jda.api.entities.Activity;
-import net.kyori.text.TextComponent;
-import net.kyori.text.format.TextColor;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 
-import java.util.Arrays;
-
-public class CommandGameStatus implements Command {
+public class CommandGameStatus implements SimpleCommand {
     /*
      This used to be "BetterDiscordBridge instance"
      But we want things to be as clean and understanding as possible.
@@ -32,35 +29,45 @@ public class CommandGameStatus implements Command {
 
     The deprecations are "execute" and "sendMessage" method.
      */
-    public void execute(CommandSource source, @NonNull String[] args) {
-        if (source.hasPermission("betterdiscordbridge.command.gamestatus")) {
-            if (args.length <= 1) {
-                source.sendMessage(TextComponent.of("Invalid usage!").color(TextColor.RED));
-                source.sendMessage(TextComponent.of("Usage: /gamestatus <playing|listening|watching> a Velocity server!").color(TextColor.RED));
-                return;
-            }
+    @Override
+    public void execute(final SimpleCommand.Invocation invocation) {
+        CommandSource source = invocation.source();
+        String[] args = invocation.arguments();
 
-            //Easier way to get the args :P
-            String fullArgs;
-            String str = Arrays.toString(args);
-            fullArgs = str.substring(1, str.length()-1).replace(",", "");
-
-                if (args[0].startsWith("Playing") || args[0].startsWith("playing")) {
-                    bridge.getJDA().getPresence().setActivity(Activity.playing(fullArgs.replace("playing", "").replace("Playing", "")));
-                    source.sendMessage(TextComponent.of("Set bots status to: " + fullArgs, TextColor.GREEN));
-                    bridge.getConfig().getConfigNode().getNode("discord", "info", "status").setValue(fullArgs);
-                    bridge.getConfig().saveConfig();
-                } else if (args[0].startsWith("Watching") || args[0].startsWith("watching")) {
-                    bridge.getJDA().getPresence().setActivity(Activity.watching(fullArgs.replace("watching", "").replace("Watching", "")));
-                    source.sendMessage(TextComponent.of("Set bots status to: " + fullArgs, TextColor.GREEN));
-                } else if (args[0].startsWith("Listening") || args[0].startsWith("listening")) {
-                    bridge.getJDA().getPresence().setActivity(Activity.listening(fullArgs.replace("listening", "").replace("Listening", "")));
-                    source.sendMessage(TextComponent.of("Set bots status to: " + fullArgs, TextColor.GREEN));
-                } else {
-                    source.sendMessage(TextComponent.of("Invalid usage!").color(TextColor.RED));
-                    source.sendMessage(TextComponent.of("Usage: /gamestatus <playing|listening|watching> a Velocity server!").color(TextColor.RED));
-                }
+        if (args.length <= 1) {
+            source.sendMessage(Component.text("Usage: /gamestatus <playing|listening|watching> a Velocity server!", NamedTextColor.RED));
+            return;
         }
+
+        StringBuilder message = new StringBuilder();
+
+        //Creates message from remaining args.
+        for(String arg : args) {
+            message.append(arg).append(" ");
+        }
+        //Deletes space at the end of the message.
+        message.deleteCharAt(args.length-1);
+
+        if (args[0].equalsIgnoreCase("playing")) {
+            bridge.getJDA().getPresence().setActivity(Activity.playing(message.toString()));
+        } else if (args[0].equalsIgnoreCase("watching")) {
+            bridge.getJDA().getPresence().setActivity(Activity.watching(message.toString()));
+        } else if (args[0].equalsIgnoreCase("listening")) {
+            bridge.getJDA().getPresence().setActivity(Activity.listening(message.toString()));
+        } else {
+            source.sendMessage(Component.text("Correct Usage: /gamestatus <playing|listening|watching> a Velocity server!", NamedTextColor.RED));
+            return;
+        }
+
+        String fullMessage = args[0] + " " + message;
+        source.sendMessage(Component.text("Set bots status to: " + fullMessage, NamedTextColor.GREEN));
+        bridge.getConfig().getConfigNode().getNode("discord", "info", "status").setValue(fullMessage);
+        bridge.getConfig().saveConfig();
+    }
+
+    @Override
+    public boolean hasPermission(final Invocation invocation) {
+        return invocation.source().hasPermission("betterdiscordbridge.command.gamestatus");
     }
 }
 

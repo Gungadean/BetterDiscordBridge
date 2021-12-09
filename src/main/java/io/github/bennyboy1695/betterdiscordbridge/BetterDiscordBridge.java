@@ -31,7 +31,7 @@ import java.util.EnumSet;
 public final class BetterDiscordBridge {
 
     // Changing VERSION = will update the whole plugins version number.
-    static final String VERSION = "1.2.4";
+    static final String VERSION = "1.3.0";
 
     private final ProxyServer server;
 
@@ -76,8 +76,7 @@ public final class BetterDiscordBridge {
 
         server.getEventManager().register(this, new VelocityEventListener(this));
 
-        // This Registration method is deprecated and will need to be updated eventually.
-        server.getCommandManager().register(new CommandGameStatus(this), "gamestatus", "gs");
+        server.getCommandManager().register(server.getCommandManager().metaBuilder("gamestatus").aliases("gs").build(), new CommandGameStatus(this));
     }
 
 
@@ -180,14 +179,15 @@ public final class BetterDiscordBridge {
 
     // This is how the GameStatus for the bot is created and set.
     public void updateGameStatus(String status) {
-        if (status.startsWith("Playing") || status.startsWith("playing")) {
-            getJDA().getPresence().setActivity(Activity.playing(status.replace("playing", "").replace("Playing", "")));
+        String[] messageSplit = status.split(" ", 2);
+        if (messageSplit[0].equalsIgnoreCase("playing")) {
+            getJDA().getPresence().setActivity(Activity.playing(messageSplit[1]));
             getLogger().info("Set bots status to: " + status);
-        } else if (status.startsWith("Watching") || status.startsWith("watching")) {
-            getJDA().getPresence().setActivity(Activity.watching(status.replace("watching", "").replace("Watching", "")));
+        } else if (messageSplit[0].equalsIgnoreCase("watching")) {
+            getJDA().getPresence().setActivity(Activity.watching(messageSplit[1]));
             getLogger().info("Set bots status to: " + status);
-        } else if (status.startsWith("Listening") || status.startsWith("listening")) {
-            getJDA().getPresence().setActivity(Activity.listening(status.replace("listening", "").replace("Listening", "")));
+        } else if (messageSplit[0].equalsIgnoreCase("listening")) {
+            getJDA().getPresence().setActivity(Activity.listening(messageSplit[1]));
             getLogger().info("Set bots status to: " + status);
         }
     }
