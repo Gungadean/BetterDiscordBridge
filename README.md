@@ -1,10 +1,12 @@
 <h1 align="center">BetterDiscordBridge</h1>
 
+This is a fork from Bennyboy1695's original code which can be found here: https://github.com/Bennyboy1695/BetterDiscordBridge
+
 A Velocity proxy discord bridge plugin like none other.
 
 ## About BetterDiscordBridge
 
-BetterDiscordBridge is a Minecraft <--> Discord bridge and vis versa, built on the velocity api 1.1.0.
+BetterDiscordBridge is a Minecraft <--> Discord bridge and vis versa, built on the velocity api 3.0.0.
 
 On top of being just another Mc Discord bridge, BetterDiscordBridge was designed with multiple servers in mind.
 
@@ -22,7 +24,7 @@ to give that feature back to the community.
 ## Future plans & Ideas
 
 - LuckPerms support for Groups, Prefix, Suffix.
-- [x] Update to Velocity-Api 1.1.0
+- [x] Update to Velocity-Api 3.0.0
 - ReCode Bot Status Command.
 - [x] Update plugin libs & dependencies
 - Add more commenting to assist with always understanding the code
