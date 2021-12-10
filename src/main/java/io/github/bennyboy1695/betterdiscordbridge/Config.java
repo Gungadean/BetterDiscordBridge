@@ -99,8 +99,7 @@ public class Config {
             if (configNode.getNode("discord", "channels", serverName, "id").isVirtual()) {
                 configNode.getNode("discord", "channels", serverName, "id").setValue(0L).setComment("This is where you put the id of the discord channel you would like to link to " + registeredServer.getServerInfo().getName() + " . This channel will only be used if mode is set to separated and if the server still exists in velocity!");
             }
-            String str = serverName;
-            String cap = str.substring(0, 1).toUpperCase() + str.substring(1);
+            String cap = serverName.substring(0, 1).toUpperCase() + serverName.substring(1);
             if (configNode.getNode("discord", "channels", serverName, "serverName").isVirtual()) {
                 configNode.getNode("discord", "channels", serverName, "serverName").setValue(cap).setComment("This is the name you want to replace <Server> in discord if useConfigServerNames is set to true!");
             }
@@ -108,10 +107,16 @@ public class Config {
 
         //Formats//
         if (configNode.getNode("format", "discord", "to").isVirtual()) {
-            configNode.getNode("format", "discord", "to").setValue("`<Server>` <User>: <Message>").setComment("This is how the chat messages will look when they go into discord! <Server> is replaced by the name of the server gotten from the Velocity config.");
+            configNode.getNode("format", "discord", "to").setValue("`{Server}` {User}: {Message}").setComment("This is how the chat messages will look when they go into discord! {Server} is replaced by the name of the server gotten from the Velocity config.");
+        }
+        if (configNode.getNode("format", "discord", "join").isVirtual()) {
+            configNode.getNode("format", "discord", "join").setValue("`{Server}` {User} has joined the game.").setComment("This is how player join messages will get formatted in discord.");
+        }
+        if (configNode.getNode("format", "discord", "disconnect").isVirtual()) {
+            configNode.getNode("format", "discord", "disconnect").setValue("{User} has left the game.").setComment("This is how player leave messages will get formatted in discord.");
         }
         if (configNode.getNode("format", "discord", "from").isVirtual()) {
-            configNode.getNode("format", "discord", "from").setValue("&f[&1Discord&f] &2<User>&f:&r <Message>").setComment("This is how messages from discord will get formatted as they go ingame!");
+            configNode.getNode("format", "discord", "from").setValue("&f[&1Discord&f] &2{User}&f:&r {Message}").setComment("This is how messages from discord will get formatted as they go ingame!");
         }
     }
 
@@ -177,7 +182,7 @@ public class Config {
 
     public long getChannels(String channel) {
         long id = 0L;
-        if (channel.toLowerCase().equals("global")) {
+        if (channel.equalsIgnoreCase("global")) {
             id = configNode.getNode("discord", "channels", "global").getLong();
         } else {
             id = configNode.getNode("discord", "channels", channel, "id").getLong();
@@ -186,16 +191,18 @@ public class Config {
     }
 
     public String getFormats(String type) {
-        String format = "";
         switch (type) {
             case "discord_to":
-                format = configNode.getNode("format", "discord", "to").getString();
-                break;
+                return configNode.getNode("format", "discord", "to").getString();
             case "discord_from":
-                format = configNode.getNode("format", "discord", "from").getString();
-                break;
+                return configNode.getNode("format", "discord", "from").getString();
+            case "discord_join":
+                return configNode.getNode("format", "discord", "join").getString();
+            case "discord_disconnect":
+                return configNode.getNode("format", "discord", "disconnect").getString();
+            default:
+                return "Something went wrong here.";
         }
-        return format;
     }
 
     public String getServerNames(String serverName) {

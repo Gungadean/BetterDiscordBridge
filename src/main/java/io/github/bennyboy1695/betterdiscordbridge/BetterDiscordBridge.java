@@ -31,7 +31,7 @@ import java.util.EnumSet;
 public final class BetterDiscordBridge {
 
     // Changing VERSION = will update the whole plugins version number.
-    static final String VERSION = "1.3.0";
+    public static final String VERSION = "1.4.0";
 
     private final ProxyServer server;
 
@@ -47,7 +47,7 @@ public final class BetterDiscordBridge {
     private JDA jda;
 
     // DiscordMethods only used for jda shutdown method, Line 140.
-    private DiscordMethods discordMethods;
+    public DiscordMethods discordMethods;
 
     @Inject
     public BetterDiscordBridge(ProxyServer server, Logger logger, @DataDirectory Path configDirectory) {
@@ -84,6 +84,8 @@ public final class BetterDiscordBridge {
     private void loadDiscord() {
         try {
             setupDiscord(getConfig().getDiscordToken(), getConfig().getGuildID(), new DiscordListener(this));
+
+            discordMethods = new DiscordMethods(this, getConfig().getGuildID());
 
             // This will send a message to the console as to indicate that the loadDiscord event is loading
             logger.info("Loading Discord Bot!");

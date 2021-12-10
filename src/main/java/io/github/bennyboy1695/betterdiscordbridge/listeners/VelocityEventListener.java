@@ -1,7 +1,10 @@
 package io.github.bennyboy1695.betterdiscordbridge.listeners;
-
 import com.velocitypowered.api.event.Subscribe;
+import com.velocitypowered.api.event.connection.DisconnectEvent;
+import com.velocitypowered.api.event.connection.PostLoginEvent;
 import com.velocitypowered.api.event.player.PlayerChatEvent;
+import com.velocitypowered.api.event.player.ServerConnectedEvent;
+import com.velocitypowered.api.proxy.server.RegisteredServer;
 import io.github.bennyboy1695.betterdiscordbridge.BetterDiscordBridge;
 import io.github.bennyboy1695.betterdiscordbridge.utils.DiscordMethods;
 
@@ -25,14 +28,43 @@ public class VelocityEventListener {
         }
 
         String message = bridge.getConfig().getFormats("discord_to")
-                .replaceAll("<Server>", Matcher.quoteReplacement(serverName))
-                .replaceAll("<User>", event.getPlayer().getUsername())
-                .replaceAll("<Message>", event.getMessage());
+                .replaceAll("\\{Server}", Matcher.quoteReplacement(serverName))
+                .replaceAll("\\{User}", event.getPlayer().getUsername())
+                .replaceAll("\\{Message}", event.getMessage());
 
         if (!bridge.getConfig().getChatMode().equals("separated")) {
-            DiscordMethods.sendMessage(bridge.getJDA(), bridge.getConfig().getChannels("global"), message);
+            bridge.discordMethods.sendMessage(bridge.getJDA(), bridge.getConfig().getChannels("global"), message);
         } else {
-           DiscordMethods.sendMessage(bridge.getJDA(), bridge.getConfig().getChannels(serverName), message);
+            bridge.discordMethods.sendMessage(bridge.getJDA(), bridge.getConfig().getChannels(serverName), message);
+        }
+    }
+
+    @Subscribe
+    public void onPlayerJoin(PostLoginEvent event) {
+        String serverName = event.getPlayer().getCurrentServer().get().getServerInfo().getName();
+
+        String message = bridge.getConfig().getFormats("discord_join")
+                .replaceAll("\\{Server}", Matcher.quoteReplacement(serverName))
+                .replaceAll("\\{User}", event.getPlayer().getUsername());
+
+        if (!bridge.getConfig().getChatMode().equals("separated")) {
+            bridge.discordMethods.sendMessage(bridge.getJDA(), bridge.getConfig().getChannels("global"), message);
+        } else {
+            bridge.discordMethods.sendMessage(bridge.getJDA(), bridge.getConfig().getChannels(serverName), message);
+        }
+    }
+
+    @Subscribe
+    public void onPlayerDisconnect(DisconnectEvent event) {
+        String message = bridge.getConfig().getFormats("discord_disconnect")
+                .replaceAll("\\{User}", event.getPlayer().getUsername());
+
+        if (!bridge.getConfig().getChatMode().equals("separated")) {
+            bridge.discordMethods.sendMessage(bridge.getJDA(), bridge.getConfig().getChannels("global"), message);
+        } else {
+            for(RegisteredServer server : bridge.getProxyServer().getAllServers()) {
+                bridge.discordMethods.sendMessage(bridge.getJDA(), bridge.getConfig().getChannels(server.getServerInfo().getName()), message);
+            }
         }
     }
 }

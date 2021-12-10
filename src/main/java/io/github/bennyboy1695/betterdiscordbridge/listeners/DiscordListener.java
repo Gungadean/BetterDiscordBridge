@@ -6,7 +6,7 @@ import com.velocitypowered.api.proxy.server.RegisteredServer;
 import io.github.bennyboy1695.betterdiscordbridge.BetterDiscordBridge;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.ReadyEvent;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.kyori.adventure.identity.Identity;
 import net.kyori.adventure.text.Component;
@@ -35,7 +35,11 @@ public class DiscordListener extends ListenerAdapter {
     }
 
     @Override
-    public void onGuildMessageReceived(@NotNull GuildMessageReceivedEvent event) {
+    public void onMessageReceived(MessageReceivedEvent event) {
+        if(!event.isFromGuild()) {
+            return;
+        }
+
         User author = event.getAuthor();
         Message message = event.getMessage();
         MessageChannel channel = event.getChannel();
@@ -50,8 +54,8 @@ public class DiscordListener extends ListenerAdapter {
         String name = member == null ? author.getName() : member.getEffectiveName();
 
         String msgformat = bridge.getConfig().getFormats("discord_from")
-                .replace("<User>", name)
-                .replace("<Message>", msg);
+                .replaceAll("\\{User}", name)
+                .replaceAll("\\{Message}", msg);
 
         Component componentMsg = LegacyComponentSerializer.legacyAmpersand().deserialize(msgformat);
 
@@ -60,13 +64,11 @@ public class DiscordListener extends ListenerAdapter {
         } else {
             for (RegisteredServer server : bridge.getProxyServer().getAllServers()) {
                 if (channel.getIdLong() == bridge.getConfig().getChannels(server.getServerInfo().getName())) {
-                    for (Player player : server.getPlayersConnected()) {
-                        player.sendMessage(Identity.nil(), componentMsg);
-                    }
+                    server.sendMessage(componentMsg);
                 }
             }
         }
-        logger.info(componentMsg.toString());
+        //logger.info(componentMsg.toString());
     }
 }
 

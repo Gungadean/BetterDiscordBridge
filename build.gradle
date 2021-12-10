@@ -2,7 +2,6 @@ buildscript {
     repositories {
         mavenLocal()
         mavenCentral()
-        jcenter()
         maven {
             url 'https://jitpack.io'
         }
@@ -21,13 +20,12 @@ apply plugin: 'java'
 apply plugin: "org.jetbrains.kotlin.jvm"
 apply plugin: 'com.github.johnrengelman.shadow'
 
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
+sourceCompatibility = 11
+targetCompatibility = 11
 
 repositories {
     mavenLocal()
     mavenCentral()
-    jcenter()
     maven {
         url 'https://jitpack.io'
     }
@@ -58,7 +56,7 @@ dependencies {
     implementation 'com.fasterxml.jackson.core:jackson-annotations:2.11.2'
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.11.2'
     implementation 'com.vdurmont:emoji-java:5.1.1'
-    implementation 'net.dv8tion:JDA:4.2.0_168'
+    implementation 'net.dv8tion:JDA:5.0.0-alpha.2'
     implementation 'org.jetbrains.kotlin:kotlin-stdlib:1.4.0'
 }
 
