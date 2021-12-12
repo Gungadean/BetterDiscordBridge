@@ -107,7 +107,7 @@ public class Config {
 
         //Formats//
         if (configNode.getNode("format", "discord", "to").isVirtual()) {
-            configNode.getNode("format", "discord", "to").setValue("`{Server}` {User}: {Message}").setComment("This is how the chat messages will look when they go into discord! {Server} is replaced by the name of the server gotten from the Velocity config.");
+            configNode.getNode("format", "discord", "to").setValue("`{Server}` {Prefix} {User} {Suffix}: {Message}").setComment("This is how the chat messages will look when they go into discord! {Server} is replaced by the name of the server gotten from the Velocity config.");
         }
         if (configNode.getNode("format", "discord", "join").isVirtual()) {
             configNode.getNode("format", "discord", "join").setValue("`{Server}` {User} has joined the game.").setComment("This is how player join messages will get formatted in discord.");

@@ -3,6 +3,7 @@ package io.github.bennyboy1695.betterdiscordbridge;
 import com.google.inject.Inject;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
+import com.velocitypowered.api.plugin.Dependency;
 import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.ProxyServer;
@@ -27,7 +28,10 @@ import java.util.EnumSet;
  The id, Name, dependencies required if any, the version of the plugin, description, and author(s)
  To credit the Origin Author and Contributors, I have changed the Author = to "Bennyboy1695 & Contributors"
  */
-@Plugin(id = "betterdiscordbridge", name = "BetterDiscordBridge", version = BetterDiscordBridge.VERSION, description = "A Velocity Proxy Discord Bridge", authors = {"Bennyboy1695 & Contributors"})
+@Plugin(id = "betterdiscordbridge", name = "BetterDiscordBridge",
+        dependencies = {@Dependency(id = "luckperms", optional = true)},
+        version = BetterDiscordBridge.VERSION, description = "A Velocity Proxy Discord Bridge",
+        authors = {"Bennyboy1695 & Contributors"})
 public final class BetterDiscordBridge {
 
     // Changing VERSION = will update the whole plugins version number.
@@ -46,6 +50,8 @@ public final class BetterDiscordBridge {
     // JDA(Java Discord Api), to lowercase jda.
     private JDA jda;
 
+    //public LuckPermsHook luckPermsHook;
+
     // DiscordMethods only used for jda shutdown method, Line 140.
     public DiscordMethods discordMethods;
 
@@ -63,6 +69,9 @@ public final class BetterDiscordBridge {
 
         this.config = new Config(configDirectory, "betterdiscordbridge.conf", logger, server);
 
+        System.out.println(server.getPluginManager().getPlugin("luckperms").isPresent());
+        server.getPluginManager().getPlugin("luckperms").ifPresent(container -> System.out.println(container.getInstance().isPresent()));
+
         try {
             loadDiscord();
         } catch (Exception e) {
@@ -73,6 +82,9 @@ public final class BetterDiscordBridge {
         if (getConfig().getUseStatus()) {
             updateGameStatus(getConfig().getGameStatus());
         }
+
+        //server.getPluginManager().getPlugin("luckperms").ifPresent(luckPermsContainer -> luckPermsContainer.getInstance().ifPresent(luckPerms ->
+        //        luckPermsHook = new LuckPermsHook(this)));
 
         server.getEventManager().register(this, new VelocityEventListener(this));
 
